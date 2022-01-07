@@ -1,0 +1,85 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Quản lý khách sạn
+{% endblock %}
+
+{% block head_css %}
+    {{  super() }}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock %}
+        {% block body %}
+            {% if current_user.is_authenticated %}
+            <h1 class="text-center text-center">Chào mừng {{current_user.name}} đến với trang quản trị</h1>
+            <h2 class="text-center"> Chúc bạn có một ngày tốt lành !!! </h2>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-md-4 col-xs-12" style="margin-top: 30px">
+                    <table class="table">
+                        <tr style="border: 2px solid black">
+                            <th style="border: 2px solid black">Tên loại</th>
+                            <th style="text-align:center">Số phòng thuộc loại</th>
+                        </tr>
+                        {% for s in sta %}
+                        <tr style="border: 2px solid black">
+                            <td style="border: 2px solid black">{{s[1]}}</td>
+                            <td class="text-success text-center">{{s[2]}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="col-md-8 col-xs-12">
+                    <canvas id="chartRoom"></canvas>
+                </div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                let labels = [], info = []
+                let colors = [], borderColors = []
+                let r, g, b
+
+                {% for s in sta %}
+                    labels.push('{{s[1]}}')
+                    info.push({{s[2]}})
+
+                    r = Math.random()*255
+                    g = Math.random()*255
+                    b = Math.random()*255
+
+                    colors.push(`rgba(${r}, ${g}, ${b}, 0.2)`)
+                    borderColors.push(`rgba(${r}, ${g}, ${b}, 1)`)
+                {% endfor %}
+
+                window.onload = function() {
+                    const ctx = document.getElementById('chartRoom').getContext('2d');
+                    const myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'TK số lượng phòng của từng loại',
+                                data: info,
+                                backgroundColor: colors,
+                                borderColor: borderColors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+
+            </script>
+            {% else %}
+                {% include 'admin/login.html' %}
+            {% endif %}
+
+        {% endblock %}
+

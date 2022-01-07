@@ -1,0 +1,158 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Chi tiet phong{% endblock %}
+
+{% block content %}
+<form action="{{ url_for('add_to_cart') }}" method="post" style="background-color: #99FFFF; padding-bottom: 40px">
+    <h1 class="text-center text-danger" style="padding: 20px 0 60px">CHI TIẾT PHÒNG</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-xs-12">
+                <img alt="{{room.name}}" src="{{url_for('static', filename=room.image)}}" width="550" height="400" />
+            </div>
+            <div class="col-md-6">
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Phòng</th>
+                        <th>Loại</th>
+                        <th>Mô tả</th>
+                        <th>Giá</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ room[0].name }}</td>
+                        <td>{{ room.description }}</td>
+                        <td>Six Senses Côn Đảo Spa được đánh giá rất chuyên nghiệp bao gồm bốn phòng trị liệu trong nhà, ba gian trị liệu ngoài trời, một Khu Yoga và Thiền.</td>
+                        <td>{{ "{:,}".format(room.price) }} VNĐ </td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+        <input style="background-color:transparent" type="hidden" value="{{room.price}}" name="price" />
+        <input style="background-color:transparent" type="hidden" value="{{room[0].name}}" name="name" />
+        <input style="background-color:transparent" type="hidden" value="{{room[0].id}}" name="id" />
+        <br>
+        {% if current_user.is_authenticated %}
+        <div>
+            <div class="form-group">
+                <textarea class="form-control" id="commentId" placeholder="Nhập nội dung bình luận....."></textarea>
+            </div>
+            <input type="button" onclick="add_comment({{room[0].id}})" value="Bình luận" class="btn btn-primary"/>
+        </div>
+        {% else %}
+            <br>
+            <a href="{{ url_for('user_signin') }}">Bạn cần đăng nhập vào tài khoản để bình luận tại đây!!!</a>
+            <br>
+        {% endif %}
+        <br>
+        <div id="commentArea">
+            {% for c in comments %}
+            <div class="row">
+                <div class="col-md-1 col-xs-4">
+                    {% if c.user.avatar and c.user.avatar.startswith('https') %}
+                    <img src="{{ c.user.avatar }}" class="img-fluid rounded-circle" alt="avatar"/>
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/NEN.jpg') }}" class="img-fluid rounded-circle" alt="avatar"/>
+                    {% endif %}
+                </div>
+                <div class="col-md-11 col-xs-8">
+                    <span>{{ c.content }}</span>
+                     <p><em class="date-time" style="font-size: 13px">{{ c.created_date }}</em></p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if pages>1 %}
+        <br>
+        <ul class="pagination">
+            {% for idx in range(1, pages+1) %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('room_detail', room_id=room[0].id, page=idx) }}">{{ idx }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <br>
+        <h2 class="text-center text-danger" style="margin: 20px">ĐẶT PHÒNG</h2>
+        <div style="background-color: #FFFFCC; border-radius: 3px; padding-top: 20px">
+            <div class="row font-weight-bold" style="margin:0 100px">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Họ tên:</label>
+                        <input type="text"
+                               class="form-control"
+                               name="guest"
+                               id="guest" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Số điện thoại:</label>
+                        <input type="text"
+                               class="form-control"
+                               name="phone"
+                               id="phone" required>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="in_date">Ngày nhận:</label>
+                        <input class="form-control"
+                               type="date"
+                               id="in_date"
+                               name="in_date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="out_date">Ngày trả:</label>
+                        <input class="form-control"
+                               type="date"
+                               id="out_date"
+                               name="out_date" required >
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="local">Khách nội địa:</label>
+                        <input class="form-control"
+                               type="number"
+                               id="local"
+                               min="0"
+                               name="local" value="1">
+                    </div>
+                     <div class="form-group">
+                         <label for="foreign">Khách quốc tế:</label>
+                         <input class="form-control"
+                                type="number"
+                                id="foreign"
+                                min="0"
+                                name="foreign" value="0">
+                    </div>
+                </div>
+                <div>
+                    <span>*Quy định</span>
+                    <ul>
+                        <li><p> Mỗi phòng được ở tối đa 3 khách.</p></li>
+                        <li><p> Đơn giá trên được áp dụng đối với phòng dành cho 2 khách trở lại.</p></li>
+                        <li><p> Nếu khách thứ 3 phụ thu thêm 25%.</p></li>
+                        <li><p> Nếu phòng có khách nước ngoài thì nhân hệ số 1.5.</p></li>
+                    </ul>
+
+                </div>
+            </div>
+            <div class="text-center" style="padding-bottom: 25px">
+                  <input class=" btn btn-success" type="submit" value="Đặt" />
+            </div>
+        </div>
+
+
+    </div>
+</form>
+<script>
+    window.onload = function() {
+        let d = document.getElementsByClassName('date-time')
+        for(let i=0; i<d.length; i++)
+            d[i].innerText = moment(d[i].innerText).fromNow()
+    }
+</script>
+{% endblock %}

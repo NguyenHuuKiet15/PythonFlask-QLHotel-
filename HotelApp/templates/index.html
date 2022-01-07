@@ -1,0 +1,38 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Trang chu{% endblock %}
+
+{% block content %}
+<h1 class="text-center text-danger" style="margin-top: 50px">ĐẶT PHÒNG KHÁCH SẠN</h1>
+    <div class="container">
+        <br>
+        <ul class="nav nav-tabs" style="margin-bottom: 30px">
+          <li class="nav-item" style=" background-color: #00FF99;">
+            <a class="nav-link" style="color: #000" href="{{url_for('index')}}">Tất cả</a>
+          </li>
+          {% for c in category %}
+            <li class="nav-item" style=" background-color: #00FF99;">
+                <a class="nav-link" style="color: #000" href="{{url_for('index', category_id = c.id)}}">{{c.name}}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="row" >
+            {% for r in rooms %}
+            <div class="col-md-6 col-xs-12">
+                <div class="card" style="margin-bottom: 29px">
+                  <img class="card-img-top" src="{{ url_for('static', filename=r.image) }}" alt="{{ r.name }}">
+                  <div class="card-body">
+                    <h4 class="card-title">{{ r[0].name }}</h4>
+                    <p class="card-text">{{ "{:,.0f}".format(r.price) }}VND</p>
+                    {% if r[0].active != True %}
+                      <a href="{{ url_for('room_detail',room_id = r[0].id) }}" class="btn btn-success">Chi tiet</a>
+                    {% else %}
+                      <p class="text-danger">Phòng đã được đặt</p>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

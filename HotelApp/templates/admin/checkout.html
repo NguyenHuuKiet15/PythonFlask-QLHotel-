@@ -1,0 +1,110 @@
+{% extends 'admin/index.html' %}
+{% block title %}
+Quản lý CheckOut
+{% endblock %}
+{% block body %}
+    {% if current_user.is_authenticated %}
+        <h5 class="text-right text-danger">Chào {{current_user.name}}</h5>
+        <br>
+    {%block index %}
+     <div class="row">
+        {% for r in rooms %}
+            <div class="col-md-3 col-xs-12">
+                <div class="card" style="margin-bottom: 29px">
+                  <img class="card-img-top" src="{{ url_for('static', filename=r.image) }}" alt="{{ r.name }}">
+                  <div class="card-body">
+                    <h4 class="card-title">{{ r[0].name }}</h4>
+                    <p class="card-text">{{ "{:,.0f}".format(r.price) }}VND</p>
+                    {% if r[0].active == True %}
+                      <input type="button" value="Trả phòng" onclick="changeActive({{r[0].id}})" class="btn btn-info" style="margin-left: 15px">
+                      <form action="{{ url_for('add_to_cart') }}" method="post">
+                          <div class="container mt-3">
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Thanh toán</button>
+                          <div class="modal fade" id="myModal">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h4 class="modal-title">THANH TOÁN</h4>
+                                  <button type="button" class="close" data-dismiss="modal">×</button>
+                                </div>
+                                <div class="modal-body">
+                                          <div class="row font-weight-bold" >
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <label>Họ tên:</label>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           name="guest"
+                                                           id="guest" required>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Số điện thoại:</label>
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           name="phone"
+                                                           id="phone" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="local">Khách nội địa:</label>
+                                                    <input class="form-control"
+                                                           type="number"
+                                                           id="local"
+                                                           min="0"
+                                                           name="local" value="1">
+                                                </div>
+                                                 <div class="form-group">
+                                                     <label for="foreign">Khách quốc tế:</label>
+                                                     <input class="form-control"
+                                                            type="number"
+                                                            id="foreign"
+                                                            min="0"
+                                                            name="foreign" value="0">
+                                                </div>
+                                            </div>
+                                          </div>
+                                                <div class="form-group">
+                                                    <label for="in_date">Ngày nhận:</label>
+                                                    <input class="form-control"
+                                                           type="date"
+                                                           id="in_date"
+                                                           name="in_date" required>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="out_date">Ngày trả:</label>
+                                                    <input class="form-control"
+                                                           type="date"
+                                                           id="out_date"
+                                                           name="out_date" required >
+                                                </div>
+                                          <div class="text-center" style="padding-bottom: 25px">
+                                          <input class=" btn btn-success" type="submit" value="Thanh toán" />
+                                          </div>
+                                </div>
+                                <div class="modal-footer">
+
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+
+                        </div>
+                      </form>
+                    {% else %}
+                      <span class="text-danger">Phòng trống </span>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+    {% endblock %}
+    {% else %}
+        {% include "admin/login.html" %}
+    {% endif %}
+
+{% endblock %}

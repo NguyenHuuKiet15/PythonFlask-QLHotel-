@@ -1,0 +1,30 @@
+{% extends 'layout/base.html' %}
+
+{%block title%}Trang dang nhap{%endblock%}
+
+{%block content%}
+    <br>
+    <h1 class="text-center text-danger"> TRANG ĐĂNG NHẬP</h1>
+    <br>
+{% if err_msg %}
+    <div class="alert alert-danger">
+        <h3>{{ err_msg }}</h3>
+    </div>
+{% endif %}
+    <div class="container" style="background-color: #99CC99">
+        <form method="post" action="{{ url_for('user_signin') }}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control" id="username" required/>
+            </div>
+            <div class="form-group">
+                <label for="pass">Password</label>
+                <input type="password" name="password" class="form-control" id="pass" required/>
+            </div>
+            <input type="submit" value="Đăng nhập" class="btn btn-danger" style="margin-bottom: 20px"/>
+        </form>
+    </div>
+    <br>
+    <br>
+    <br>
+{% endblock %}

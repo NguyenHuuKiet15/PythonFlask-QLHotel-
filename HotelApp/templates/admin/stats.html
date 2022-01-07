@@ -1,0 +1,108 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Quản lý khách sạn
+{% endblock %}
+
+{% block head_css %}
+    {{  super() }}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock %}
+        {% block body %}
+            {% if current_user.is_authenticated %}
+            <h5 class="text-right text-danger">Chào {{current_user.name}}</h5>
+            <br>
+            <h1 class="text-center text-danger">THỐNG KÊ DOANH THU</h1>
+            <br>
+             <div class="row">
+                <div class="col-md-5 col-xs-12" style="margin-top: 30px">
+                    <table class="table">
+                        <tr style="border: 2px solid black">
+                            <th style="border: 2px solid black">Mã phòng</th>
+                            <th style="text-align:center; border: 2px solid black">Tên phòng</th>
+                            <th style="text-align:center">Doanh thu</th>
+                        </tr>
+                        {% for s in stats %}
+                        <tr style="border: 2px solid black">
+                            <td style="border: 2px solid black">{{s[0]}}</td>
+                            <td style="border: 2px solid black">{{s[1]}}</td>
+                            <td class="text-success text-center">
+                                {% if s[2]%}
+                                    {{ "{:,.1f}".format(s[2]) }} VNĐ
+                                {% else %}
+                                    0VNĐ
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="col-md-7 col-xs-12">
+                    <form>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="kw" placeholder="Nhập loại phòng...."/>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" class="form-control" name="from_date"/>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" class="form-control" name="to_date"/>
+                        </div>
+                        <input type="submit" class="btn btn-info" value="Chọn">
+                    </form>
+                    <canvas id="chartRoomId"></canvas>
+                </div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                let labels = [], info = []
+                let colors = [], borderColors = []
+                let r, g, b
+
+                {% for s in stats %}
+                    {% if s[2] %}
+                        labels.push('{{s[1]}}')
+                        info.push({{s[2]}})
+
+                        r = Math.random()*255
+                        g = Math.random()*255
+                        b = Math.random()*255
+
+                        colors.push(`rgba(${r}, ${g}, ${b}, 0.2)`)
+                        borderColors.push(`rgba(${r}, ${g}, ${b}, 1)`)
+                    {% endif %}
+                {% endfor %}
+
+                window.onload = function() {
+                    const ctx = document.getElementById('chartRoomId').getContext('2d');
+                    loadChart(ctx, labels, info, 'line', colors, borderColors)
+                }
+
+            function loadChart(ctx, labels, info, type, colors, borderColors) {
+                    const myChart = new Chart(ctx, {
+                        type: type,
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Thống kê doanh thu',
+                                data: info,
+                                backgroundColor: colors,
+                                borderColor: borderColors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            </script>
+             {% else %}
+                {% include 'admin/login.html' %}
+             {% endif %}
+        {% endblock %}

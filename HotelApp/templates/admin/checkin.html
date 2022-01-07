@@ -1,0 +1,34 @@
+{% extends 'admin/index.html' %}
+{% block title %}
+Quản lý CheckIn
+{% endblock %}
+{% block body %}
+    {% if current_user.is_authenticated %}
+        <h5 class="text-right text-danger">Chào {{current_user.name}}</h5>
+        <br>
+    {%block index %}
+    <div class="row">
+        {% for r in rooms %}
+            <div class="col-md-3 col-xs-12">
+                <div class="card" style="margin-bottom: 29px">
+                  <img class="card-img-top" src="{{ url_for('static', filename=r.image) }}" alt="{{ r.name }}">
+                  <div class="card-body">
+                    <h4 class="card-title">{{ r[0].name }}</h4>
+                    <p class="card-text">{{ "{:,}".format(r.price) }} VNĐ</p>
+                    {% if r[0].active != True %}
+                      <input type="button" value="Nhận phòng" onclick="changeActive({{r[0].id}})" class="btn btn-info">
+
+                    {% else %}
+                      <span class="text-danger">Phòng đã được CheckIn </span>
+                    {% endif %}
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+    {% endblock %}
+    {% else %}
+        {% include "admin/login.html" %}
+    {% endif %}
+
+{% endblock %}
